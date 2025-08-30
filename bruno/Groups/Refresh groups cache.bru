@@ -1,0 +1,11 @@
+meta {
+  name: Refresh groups cache
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/groups/refresh
+  body: none
+  auth: inherit
+}

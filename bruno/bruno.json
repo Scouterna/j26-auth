@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "J26 Scoutnet Cache",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
