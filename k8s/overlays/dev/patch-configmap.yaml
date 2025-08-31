@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: j26-auth-config
+data:
+  PUBLIC_URL: https://app.dev.j26.se/auth
+  OIDC_SERVER: https://localhost:8443/realms/test
+  OIDC_CLIENT_ID: j26-apps
+  OIDC_CLIENT_SECRET: abc123
