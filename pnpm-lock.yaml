@@ -20,9 +20,6 @@ importers:
       '@scalar/hono-api-reference':
         specifier: ^0.9.13
         version: 0.9.16(hono@4.9.5)
-      '@scouterna/scoutnet':
-        specifier: ^0.3.13
-        version: 0.3.13
       arktype:
         specifier: ^2.1.20
         version: 2.1.20
@@ -32,6 +29,12 @@ importers:
       hono-openapi:
         specifier: ^0.4.8
         version: 0.4.8(@hono/arktype-validator@2.0.1(arktype@2.1.20)(hono@4.9.5))(arktype@2.1.20)(hono@4.9.5)(openapi-types@12.1.3)(zod@3.24.1)
+      jose:
+        specifier: ^6.1.0
+        version: 6.1.0
+      openid-client:
+        specifier: ^6.7.1
+        version: 6.7.1
     devDependencies:
       '@biomejs/biome':
         specifier: 2.2.0
@@ -141,9 +144,6 @@ packages:
     resolution: {integrity: sha512-rO6KGMJqOsBnN/2R4fErMFLpRSPVJElni+HABDpf+ZlLJp2lvxuPn0IXLumK5ytfplUH9iqKgSXjndnZfxSYLQ==}
     engines: {node: '>=20'}
 
-  '@scouterna/scoutnet@0.3.13':
-    resolution: {integrity: sha512-dJ+a/v184UOK/S/vkkKe2pw6y4+u6NCrAUWlr1PLuxNqHRqxIrFdAMS3GgGpC6EQGS0qZ5Q+p2Wu9xKNFyfYEw==}
-
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
@@ -209,6 +209,9 @@ packages:
     resolution: {integrity: sha512-aLAVl5/67ifNnoFVxnhR89dpmSLsgwBprw/PT671ASwUpJqmd7Ne8KPTQo37DbRZfgpHaHeZ4bPVUvbOkeedMw==}
     engines: {node: '>=16.9.0'}
 
+  jose@6.1.0:
+    resolution: {integrity: sha512-TTQJyoEoKcC1lscpVDCSsVgYzUDg/0Bt3WE//WiTPK6uOCQC2KZS4MpugbMWt/zyjkopgZoXhZuCi00gLudfUA==}
+
   js-yaml@4.1.0:
     resolution: {integrity: sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==}
     hasBin: true
@@ -222,14 +225,14 @@ packages:
     engines: {node: ^18 || >=20}
     hasBin: true
 
-  openapi-fetch@0.13.8:
-    resolution: {integrity: sha512-yJ4QKRyNxE44baQ9mY5+r/kAzZ8yXMemtNAOFwOzRXJscdjSxxzWSNlyBAr+o5JjkUw9Lc3W7OIoca0cY3PYnQ==}
+  oauth4webapi@3.8.1:
+    resolution: {integrity: sha512-olkZDELNycOWQf9LrsELFq8n05LwJgV8UkrS0cburk6FOwf8GvLam+YB+Uj5Qvryee+vwWOfQVeI5Vm0MVg7SA==}
 
   openapi-types@12.1.3:
     resolution: {integrity: sha512-N4YtSYJqghVu4iek2ZUvcN/0aqH1kRDuNqzcycDxhOUpg7GdvLa2F3DgS6yBNhInhv2r/6I0Flkn7CqL8+nIcw==}
 
-  openapi-typescript-helpers@0.0.15:
-    resolution: {integrity: sha512-opyTPaunsklCBpTK8JGef6mfPhLSnyy5a0IN9vKtx3+4aExf+KxEqYwIy3hqkedXIB97u357uLMJsOnm3GVjsw==}
+  openid-client@6.7.1:
+    resolution: {integrity: sha512-kOiE4q0kNogr90hXsxPrKeEDuY+V0kkZazvZScOwZkYept9slsaQ3usXTaKkm6I04vLNuw5caBoX7UfrwC6x8w==}
 
   typescript@5.9.2:
     resolution: {integrity: sha512-CWBzXQrc/qOkhidw1OzBTQuYRbfyxDXJMVJ1XNwUHGROVmuaeiEm3OslpZ1RV96d7SKKjZKrSJu3+t/xlw3R9A==}
@@ -321,10 +324,6 @@ snapshots:
       nanoid: 5.1.5
       zod: 3.24.1
 
-  '@scouterna/scoutnet@0.3.13':
-    dependencies:
-      openapi-fetch: 0.13.8
-
   '@types/json-schema@7.0.15': {}
 
   '@types/node@24.3.0':
@@ -352,6 +351,8 @@ snapshots:
 
   hono@4.9.5: {}
 
+  jose@6.1.0: {}
+
   js-yaml@4.1.0:
     dependencies:
       argparse: 2.0.1
@@ -363,13 +364,14 @@ snapshots:
 
   nanoid@5.1.5: {}
 
-  openapi-fetch@0.13.8:
-    dependencies:
-      openapi-typescript-helpers: 0.0.15
+  oauth4webapi@3.8.1: {}
 
   openapi-types@12.1.3: {}
 
-  openapi-typescript-helpers@0.0.15: {}
+  openid-client@6.7.1:
+    dependencies:
+      jose: 6.1.0
+      oauth4webapi: 3.8.1
 
   typescript@5.9.2: {}
 

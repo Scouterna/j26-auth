@@ -4,12 +4,17 @@ services:
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      # Certificate and key for HTTPS
+      KC_HTTPS_CERTIFICATE_KEY_FILE: /opt/keycloak/conf/certs/keycloak.key.pem
+      KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/conf/certs/keycloak.cert.pem
     ports:
-      - "8080:8080"
+      # - "8080:8080"
+      - "8443:8443"
     command:
       - start-dev
     volumes:
       - keycloak_data:/opt/keycloak/data
+      - ./certs:/opt/keycloak/conf/certs:ro
 
 volumes:
   keycloak_data:

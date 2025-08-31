@@ -17,7 +17,9 @@
 		"@scalar/hono-api-reference": "^0.9.13",
 		"arktype": "^2.1.20",
 		"hono": "^4.9.1",
-		"hono-openapi": "^0.4.8"
+		"hono-openapi": "^0.4.8",
+		"jose": "^6.1.0",
+		"openid-client": "^6.7.1"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.2.0",

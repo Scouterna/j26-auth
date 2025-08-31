@@ -23,13 +23,13 @@ app
 		openAPISpecs(app, {
 			documentation: {
 				info: {
-					title: 'Hono',
-					version: '1.0.0',
-					description: 'API for greeting users',
+					title: 'j26-auth',
+					version: '0.0.0',
+					description: 'Authentication service for Jamboree26',
 				},
 				servers: [
 					{
-						url: 'http://localhost:3000',
+						url: 'https://localhost:3000',
 						description: 'Local server',
 					},
 				],
