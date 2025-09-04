@@ -3,7 +3,7 @@ import { type } from 'arktype';
 const Config = type({
 	'+': 'delete',
 	'PORT?': type('string.integer>0').pipe((value) => Number.parseInt(value, 10)),
-	PUBLIC_URL: type.string.pipe((url) => url.replace(/\/+$/, '')), // Remove trailing slashes
+	PUBLIC_URL: type.string.pipe((url) => url.replace(/\/*$/, '/')),
 	'HTTPS_KEY?': type.string,
 	'HTTPS_CERT?': type.string,
 	OIDC_SERVER: type.string,

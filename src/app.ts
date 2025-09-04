@@ -5,11 +5,12 @@ import { Scalar } from '@scalar/hono-api-reference';
 import { Hono } from 'hono';
 import { openAPISpecs } from 'hono-openapi';
 import auth from './resources/auth/routes.ts';
+import config from './config.ts';
 
 const app = new Hono();
 
 app
-	.get('/', (c) => c.redirect('/docs'))
+	.get('/', (c) => c.redirect(new URL('./docs', config.PUBLIC_URL)))
 	.get(
 		'/docs',
 		Scalar({
