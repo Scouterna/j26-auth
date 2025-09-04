@@ -6,3 +6,4 @@ resources:
   - deployment.yaml
   - service.yaml
   - secret-provider-class.yaml
+  - ingress.yaml
