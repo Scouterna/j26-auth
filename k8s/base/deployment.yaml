@@ -21,3 +21,14 @@ spec:
                 name: j26-auth-config
             - secretRef:
                 name: j26-auth-secrets
+          volumeMounts:
+            - name: secrets-store
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+      volumes:
+        - name: secrets-store
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: j26-auth-kv-csi
