@@ -19,3 +19,5 @@ spec:
           envFrom:
             - configMapRef:
                 name: j26-auth-config
+            - secretRef:
+                name: keycloak-secrets

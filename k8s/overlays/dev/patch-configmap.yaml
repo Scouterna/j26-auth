@@ -4,6 +4,6 @@ metadata:
   name: j26-auth-config
 data:
   PUBLIC_URL: https://app.dev.j26.se/auth
-  OIDC_SERVER: https://id.maws.se//realms/test
+  OIDC_SERVER: https://id.dev.j26.se/realms/j26
   OIDC_CLIENT_ID: j26-apps
-  OIDC_CLIENT_SECRET: abc123
+  # OIDC_CLIENT_SECRET: abc123
