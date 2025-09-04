@@ -17,7 +17,7 @@ spec:
       http:
         paths:
           - path: /auth(/|$)(.*)
-            pathType: Prefix
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: j26-auth
