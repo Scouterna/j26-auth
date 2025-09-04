@@ -3,10 +3,12 @@ import { createServer } from 'node:http';
 import { createServer as createHttpsServer } from 'node:https';
 import { serve } from '@hono/node-server';
 import config, { loadConfig } from './config.ts';
+import  { initializeOIDC } from './oidc.ts';
 
 type ServeOptions = Parameters<typeof serve>[0];
 
 loadConfig();
+await initializeOIDC()
 
 /**
  * Utility function to conditionally create HTTPS server
