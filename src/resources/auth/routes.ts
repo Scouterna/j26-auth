@@ -121,7 +121,7 @@ const app = new Hono()
 				return c.text('Invalid redirect URI', 400);
 			}
 
-			const redirectUri = `${config.PUBLIC_URL}/callback`;
+			const redirectUri = new URL('./callback', config.PUBLIC_URL).href;
 
 			const codeVerifier: string = oidcClient.randomPKCECodeVerifier();
 			const codeChallenge: string =
