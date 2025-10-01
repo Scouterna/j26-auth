@@ -4,8 +4,8 @@ import { Scalar } from '@scalar/hono-api-reference';
 
 import { Hono } from 'hono';
 import { openAPISpecs } from 'hono-openapi';
-import auth from './resources/auth/routes.ts';
 import config from './config.ts';
+import auth from './resources/auth/routes.ts';
 
 const app = new Hono();
 
@@ -30,8 +30,24 @@ app
 				},
 				servers: [
 					{
-						url: 'https://localhost:3000',
-						description: 'Local server',
+						url: 'https://app.jamboree.se/auth',
+						description: 'Production server',
+					},
+					{
+						url: 'https://dev.j26.se/auth',
+						description: 'Development server',
+					},
+				],
+				tags: [
+					{
+						name: 'public',
+						description:
+							'Public endpoints. These are the endpoints that you as a consumer should be using.',
+					},
+					{
+						name: 'internal',
+						description:
+							'Internal endpoints. These are used by the authentication service and should never be called by a consumer service.',
 					},
 				],
 			},

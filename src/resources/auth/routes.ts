@@ -97,7 +97,13 @@ const app = new Hono()
 	.get(
 		'/login',
 		describeRoute({
-			description: 'Redirects to the authentication provider login page.',
+			tags: ['public'],
+			summary: 'Login',
+			description: `
+Redirects to the authentication provider login page.
+
+To initiate the login process, redirect the user to this endpoint. If you do not want the user to be prompted for login even if they're not logged in, you can use the \`silent\` query parameter.
+`,
 			responses: {
 				302: { description: 'Redirect to authentication provider login page' },
 				400: { description: 'Bad request' },
@@ -111,8 +117,13 @@ const app = new Hono()
 		validator(
 			'query',
 			type({
-				'silent?': '"true"|"false"',
-				redirect_uri: 'string',
+				'silent?': type('"true"|"false"').describe(
+					'If `true`, the user will not be prompted for login even if they are not logged in. This is useful for checking if the user is already logged in without interrupting their experience.',
+					'self',
+				),
+				redirect_uri: type('string').describe(
+					'The URI to redirect to after login. Should be a user-facing page in your application, most likely the page the user was on before being redirected to the login page.',
+				),
 			}),
 		),
 		async (c) => {
@@ -176,9 +187,110 @@ const app = new Hono()
 			return c.redirect(redirectTo.href);
 		},
 	)
+
+	.get(
+		'/refresh',
+		describeRoute({
+			tags: ['public'],
+			summary: 'Refresh',
+			description: `
+Refreshes the access token using the refresh token.
+
+This should be called *from the frontend* using \`fetch\` just before the token is about to expire. If you're developing an application you can use the script provided in the [j26-auth repository](https://github.com/scouterna/j26-auth) to do this for you.
+`,
+			responses: {
+				200: { description: 'Access token refreshed successfully' },
+				401: { description: 'No or invalid refresh token.' },
+			},
+			validateResponse: {
+				status: 500,
+				message:
+					'Response validation failed. Please contact the service owner.',
+			},
+		}),
+		async (c) => {
+			const refreshToken = getCookie(c, COOKIES.refreshToken);
+			if (!refreshToken) {
+				return c.json({ error: 'Unauthorized' }, 401);
+			}
+
+			let rawTokens: oidcClient.TokenEndpointResponse &
+				oidcClient.TokenEndpointResponseHelpers;
+
+			try {
+				rawTokens = await oidcClient.refreshTokenGrant(
+					oidcConfig,
+					refreshToken,
+					{ scope },
+				);
+			} catch (e) {
+				if (
+					e instanceof oidcClient.ResponseBodyError &&
+					e.error === 'invalid_grant'
+				) {
+					clearAuthCookies(c);
+					return c.json({ error: 'Unauthorized' }, 401);
+				}
+
+				throw e;
+			}
+
+			const tokens = Tokens(rawTokens);
+			if (tokens instanceof type.errors) {
+				return c.text('Invalid token response', 500);
+			}
+
+			setTokenCookies(c, tokens);
+
+			return c.json({});
+		},
+	)
+	.get(
+		'/user',
+		describeRoute({
+			tags: ['public'],
+			summary: 'Get user info',
+			description:
+				'Fetches the user information from the authentication provider.',
+			responses: {
+				200: { description: 'User information retrieved successfully' },
+				401: { description: 'Unauthorized' },
+			},
+			validateResponse: {
+				status: 500,
+				message:
+					'Response validation failed. Please contact the service owner.',
+			},
+		}),
+		async (c) => {
+			const accessToken = getCookie(c, COOKIES.accessToken);
+			if (!accessToken) {
+				return c.json({ error: 'Unauthorized' }, 401);
+			}
+
+			const { payload } = await jose.jwtVerify(accessToken, JWKS);
+
+			const user = TokenPayload(payload);
+
+			if (user instanceof type.errors) {
+				return c.json({ error: 'Malformed token' }, 401);
+			}
+
+			return c.json({
+				user: {
+					name: user.name,
+					preferredUsername: user.preferred_username,
+					givenName: user.given_name,
+					familyName: user.family_name,
+					email: user.email,
+				},
+			});
+		},
+	)
 	.get(
 		'/callback',
 		describeRoute({
+			tags: ['internal'],
 			description: 'Handles the callback from the authentication provider.',
 			responses: {
 				302: { description: 'Redirect to the application home page' },
@@ -235,97 +347,6 @@ const app = new Hono()
 			setTokenCookies(c, tokens);
 
 			return c.redirect(finalRedirectUri);
-		},
-	)
-	.get(
-		'/user',
-		describeRoute({
-			description:
-				'Fetches the user information from the authentication provider.',
-			responses: {
-				200: { description: 'User information retrieved successfully' },
-				401: { description: 'Unauthorized' },
-			},
-			validateResponse: {
-				status: 500,
-				message:
-					'Response validation failed. Please contact the service owner.',
-			},
-		}),
-		async (c) => {
-			const accessToken = getCookie(c, COOKIES.accessToken);
-			if (!accessToken) {
-				return c.json({ error: 'Unauthorized' }, 401);
-			}
-
-			const { payload } = await jose.jwtVerify(accessToken, JWKS);
-
-			const user = TokenPayload(payload);
-
-			if (user instanceof type.errors) {
-				return c.json({ error: 'Malformed token' }, 401);
-			}
-
-			return c.json({
-				user: {
-					name: user.name,
-					preferredUsername: user.preferred_username,
-					givenName: user.given_name,
-					familyName: user.family_name,
-					email: user.email,
-				},
-			});
-		},
-	)
-	.get(
-		'/refresh',
-		describeRoute({
-			description: 'Refreshes the access token using the refresh token.',
-			responses: {
-				200: { description: 'Access token refreshed successfully' },
-				401: { description: 'No or invalid refresh token.' },
-			},
-			validateResponse: {
-				status: 500,
-				message:
-					'Response validation failed. Please contact the service owner.',
-			},
-		}),
-		async (c) => {
-			const refreshToken = getCookie(c, COOKIES.refreshToken);
-			if (!refreshToken) {
-				return c.json({ error: 'Unauthorized' }, 401);
-			}
-
-			let rawTokens: oidcClient.TokenEndpointResponse &
-				oidcClient.TokenEndpointResponseHelpers;
-
-			try {
-				rawTokens = await oidcClient.refreshTokenGrant(
-					oidcConfig,
-					refreshToken,
-					{ scope },
-				);
-			} catch (e) {
-				if (
-					e instanceof oidcClient.ResponseBodyError &&
-					e.error === 'invalid_grant'
-				) {
-					clearAuthCookies(c);
-					return c.json({ error: 'Unauthorized' }, 401);
-				}
-
-				throw e;
-			}
-
-			const tokens = Tokens(rawTokens);
-			if (tokens instanceof type.errors) {
-				return c.text('Invalid token response', 500);
-			}
-
-			setTokenCookies(c, tokens);
-
-			return c.json({});
 		},
 	);
 
