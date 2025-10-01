@@ -3,7 +3,14 @@ import { type } from 'arktype';
 const Config = type({
 	'+': 'delete',
 	'PORT?': type('string.integer>0').pipe((value) => Number.parseInt(value, 10)),
+	'INSECURE_COOKIES?': type.string.pipe((val) => val === 'true' || val === '1'),
 	PUBLIC_URL: type.string.pipe((url) => url.replace(/\/*$/, '/')),
+	ALLOWED_REDIRECT_DOMAINS: type.string.pipe((domains) =>
+		domains
+			.split(',')
+			.map((d) => d.trim())
+			.filter((d) => d.length > 0),
+	),
 	'HTTPS_KEY?': type.string,
 	'HTTPS_CERT?': type.string,
 	OIDC_SERVER: type.string,

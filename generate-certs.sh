@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/bin/bash
 
 # This script generates self-signed certificates for development.
 

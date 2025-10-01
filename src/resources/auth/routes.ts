@@ -34,8 +34,10 @@ function redirectUriValid(uri: string | undefined): uri is string {
 	if (!uri) return false;
 
 	const redirectUri = new URL(uri);
-	const publicUrl = new URL(config.PUBLIC_URL);
-	return redirectUri.host === publicUrl.host;
+
+	return config.ALLOWED_REDIRECT_DOMAINS.some((domain) => {
+		return redirectUri.host === domain;
+	});
 }
 
 function clearAuthCookies(c: Context) {
@@ -49,14 +51,14 @@ function setTokenCookies(c: Context, tokens: Tokens) {
 
 	const sensitiveCookieOptions: CookieOptions = {
 		httpOnly: true,
-		secure: true,
+		secure: !config.INSECURE_COOKIES,
 		sameSite: 'Strict',
 		expires,
 	};
 
 	const publicCookieOptions: CookieOptions = {
 		httpOnly: false,
-		secure: true,
+		secure: !config.INSECURE_COOKIES,
 		sameSite: 'Strict',
 		expires,
 	};
@@ -156,7 +158,7 @@ const app = new Hono()
 
 			const cookieOptions: CookieOptions = {
 				httpOnly: true,
-				secure: true,
+				secure: !config.INSECURE_COOKIES,
 				sameSite: 'Strict',
 				expires: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes
 			};
@@ -189,6 +191,7 @@ const app = new Hono()
 		}),
 		async (c) => {
 			const finalRedirectUri = getCookie(c, COOKIES.redirectUri);
+			console.log('Validating final redirect URI', finalRedirectUri);
 
 			if (!redirectUriValid(finalRedirectUri)) {
 				return c.text('Invalid redirect URI', 400);
