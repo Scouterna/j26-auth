@@ -1,5 +1,5 @@
 import { configure } from 'arktype/config';
 
 configure({
-	onUndeclaredKey: 'reject',
+  onUndeclaredKey: 'reject',
 });

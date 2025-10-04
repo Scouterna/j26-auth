@@ -1,29 +1,32 @@
 {
-	"name": "j26-auth",
-	"type": "module",
-	"license": "MIT",
-	"packageManager": "pnpm@10.11.0",
-	"scripts": {
-		"dev": "node --env-file .env --watch src/index.ts",
-		"start": "node --env-file .env src/index.ts",
-		"gen:docs": "pnpm run gen:openapi && npm run gen:scalar",
-		"gen:openapi": "SUPPRESS_CONFIG_WARNINGS=true node scripts/generateOpenApiSpec.ts",
-		"gen:scalar": "node scripts/generateScalarDocs.ts"
-	},
-	"dependencies": {
-		"@hono/arktype-validator": "^2.0.1",
-		"@hono/node-server": "^1.18.2",
-		"@scalar/core": "^0.3.11",
-		"@scalar/hono-api-reference": "^0.9.13",
-		"arktype": "^2.1.20",
-		"hono": "^4.9.1",
-		"hono-openapi": "^0.4.8",
-		"jose": "^6.1.0",
-		"openid-client": "^6.7.1"
-	},
-	"devDependencies": {
-		"@biomejs/biome": "2.2.0",
-		"@types/node": "^24.2.1",
-		"typescript": "^5.9.2"
-	}
+  "name": "j26-auth",
+  "type": "module",
+  "license": "MIT",
+  "packageManager": "pnpm@10.17.1",
+  "scripts": {
+    "dev": "node --env-file .env --watch src/index.ts",
+    "start": "node --env-file .env src/index.ts",
+    "lint": "biome check",
+    "lint:fix": "biome check --write",
+    "gen:docs": "pnpm run gen:openapi && npm run gen:scalar",
+    "gen:openapi": "SUPPRESS_CONFIG_WARNINGS=true node scripts/generateOpenApiSpec.ts",
+    "gen:scalar": "node scripts/generateScalarDocs.ts"
+  },
+  "dependencies": {
+    "@hono/arktype-validator": "^2.0.1",
+    "@hono/node-server": "^1.19.5",
+    "@hono/standard-validator": "^0.1.5",
+    "@scalar/core": "^0.3.17",
+    "@scalar/hono-api-reference": "^0.9.19",
+    "arktype": "^2.1.22",
+    "hono": "4.9.9",
+    "hono-openapi": "^1.1.0",
+    "jose": "^6.1.0",
+    "openid-client": "^6.8.1"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.2.4",
+    "@types/node": "^24.6.1",
+    "typescript": "^5.9.3"
+  }
 }

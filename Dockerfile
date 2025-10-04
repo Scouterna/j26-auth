@@ -27,6 +27,7 @@ USER node
 
 # Copy the rest of the source files into the image.
 COPY ./src ./src
+COPY ./static ./static
 
 # Expose the port that the application listens on.
 EXPOSE 80

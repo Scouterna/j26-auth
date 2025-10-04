@@ -1,50 +1,50 @@
 import { type } from 'arktype';
 
 const Config = type({
-	'+': 'delete',
-	'PORT?': type('string.integer>0').pipe((value) => Number.parseInt(value, 10)),
-	'INSECURE_COOKIES?': type.string.pipe((val) => val === 'true' || val === '1'),
-	PUBLIC_URL: type.string.pipe((url) => url.replace(/\/*$/, '/')),
-	ALLOWED_REDIRECT_DOMAINS: type.string.pipe((domains) =>
-		domains
-			.split(',')
-			.map((d) => d.trim())
-			.filter((d) => d.length > 0),
-	),
-	'HTTPS_KEY?': type.string,
-	'HTTPS_CERT?': type.string,
-	OIDC_SERVER: type.string,
-	OIDC_CLIENT_ID: type.string,
-	OIDC_CLIENT_SECRET: type.string,
+  '+': 'delete',
+  'PORT?': type('string.integer>0').pipe((value) => Number.parseInt(value, 10)),
+  'INSECURE_COOKIES?': type.string.pipe((val) => val === 'true' || val === '1'),
+  PUBLIC_URL: type.string.pipe((url) => url.replace(/\/*$/, '/')),
+  ALLOWED_REDIRECT_DOMAINS: type.string.pipe((domains) =>
+    domains
+      .split(',')
+      .map((d) => d.trim())
+      .filter((d) => d.length > 0),
+  ),
+  'HTTPS_KEY?': type.string,
+  'HTTPS_CERT?': type.string,
+  OIDC_SERVER: type.string,
+  OIDC_CLIENT_ID: type.string,
+  OIDC_CLIENT_SECRET: type.string,
 });
 type Config = typeof Config.infer;
 
 let rawConfig: Config;
 
 export function loadConfig() {
-	const parsedConfig = Config(process.env);
+  const parsedConfig = Config(process.env);
 
-	if (parsedConfig instanceof type.errors) {
-		throw new Error(
-			`Configuration validation failed:\n${parsedConfig.summary}`,
-		);
-	}
+  if (parsedConfig instanceof type.errors) {
+    throw new Error(
+      `Configuration validation failed:\n${parsedConfig.summary}`,
+    );
+  }
 
-	rawConfig = parsedConfig;
+  rawConfig = parsedConfig;
 }
 
 const config = new Proxy({} as Config, {
-	get(_, prop: keyof Config) {
-		if (rawConfig) return rawConfig[prop];
+  get(_, prop: keyof Config) {
+    if (rawConfig) return rawConfig[prop];
 
-		if (
-			!process.env.SUPPRESS_CONFIG_WARNINGS ||
-			process.env.SUPPRESS_CONFIG_WARNINGS === 'false'
-		) {
-			console.warn(`Accessing property ${prop} before config is loaded`);
-		}
-		return undefined;
-	},
+    if (
+      !process.env.SUPPRESS_CONFIG_WARNINGS ||
+      process.env.SUPPRESS_CONFIG_WARNINGS === 'false'
+    ) {
+      console.warn(`Accessing property ${prop} before config is loaded`);
+    }
+    return undefined;
+  },
 });
 
 export default config as Config;
