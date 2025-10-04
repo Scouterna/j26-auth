@@ -61,6 +61,7 @@ app.use(
   '/static/*',
   serveStatic({
     root: new URL('../', import.meta.url).pathname,
+    rewriteRequestPath: (path) => path.replace(/^\/auth\//, '/'),
     onNotFound: (path, c) => {
       console.log(`${path} is not found, you access ${c.req.path}`);
     },
