@@ -6,8 +6,11 @@ import { Scalar } from '@scalar/hono-api-reference';
 import { Hono } from 'hono';
 import { openAPIRouteHandler } from 'hono-openapi';
 import auth from './resources/auth/routes.ts';
+import { logger } from 'hono/logger';
 
 const app = new Hono();
+
+app.use(logger())
 
 app
   .get('/', (c) => c.redirect(new URL('./docs', c.req.url)))
