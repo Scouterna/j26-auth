@@ -10,7 +10,7 @@ import auth from './resources/auth/routes.ts';
 const app = new Hono();
 
 app
-  .get('/', (c) => c.redirect('./docs'))
+  .get('/', (c) => c.redirect(new URL('./docs', c.req.url)))
   .get(
     '/docs',
     Scalar({
