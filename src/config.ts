@@ -16,6 +16,7 @@ const Config = type({
   OIDC_SERVER: type.string,
   OIDC_CLIENT_ID: type.string,
   OIDC_CLIENT_SECRET: type.string,
+  'LOG_REQUESTS?': type.string.pipe((val) => val === 'true' || val === '1'),
 });
 type Config = typeof Config.infer;
 

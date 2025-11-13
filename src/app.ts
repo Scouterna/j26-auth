@@ -7,13 +7,20 @@ import { Hono } from 'hono';
 import { openAPIRouteHandler } from 'hono-openapi';
 import auth from './resources/auth/routes.ts';
 import { logger } from 'hono/logger';
+import config from './config.ts';
+
+const DOCS_URL = `${config.PUBLIC_URL.replace(/\/+$/, '')}/docs`;
 
 const app = new Hono();
 
-app.use(logger())
+if (config.LOG_REQUESTS) {
+  app.use(logger());
+}
 
 app
-  .get('/', (c) => c.redirect(new URL('./docs', c.req.url)))
+  .get('/', (c) => {
+    return c.redirect(DOCS_URL);
+  })
   .get(
     '/docs',
     Scalar({
@@ -71,8 +78,9 @@ app.use(
   }),
 );
 
-const rootApp = new Hono();
-rootApp.route('/auth', app);
+// const rootApp = new Hono();
+// rootApp.route('/', app);
 
-export default rootApp;
+// export default rootApp;
+export default app;
 export type AppType = typeof routes;
