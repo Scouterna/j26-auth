@@ -41,12 +41,12 @@ app
         },
         servers: [
           {
-            url: 'https://app.jamboree.se/auth',
-            description: 'Production server',
+            url: 'https://app.dev.j26.se/auth',
+            description: 'Development server',
           },
           {
-            url: 'https://dev.j26.se/auth',
-            description: 'Development server',
+            url: 'https://app.jamboree.se/auth',
+            description: 'Production server',
           },
         ],
         tags: [
