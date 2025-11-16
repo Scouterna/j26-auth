@@ -306,7 +306,9 @@ This should be called *from the frontend* using \`fetch\` just before the token 
       const publicUrl = new URL(config.PUBLIC_URL);
 
       url.pathname =
-        publicUrl.pathname.replace(/\/$/, '') + url.pathname.replace(/^\//, '');
+        publicUrl.pathname.replace(/\/$/, '') +
+        '/' +
+        url.pathname.replace(/^\//, '');
       url.host = proxiedHost || publicUrl.host;
       url.port = proxiedPort || publicUrl.port;
       url.protocol = proxiedProto || publicUrl.protocol;
