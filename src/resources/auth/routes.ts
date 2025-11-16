@@ -312,6 +312,8 @@ This should be called *from the frontend* using \`fetch\` just before the token 
         url.protocol = proxiedProto;
       }
 
+      console.log('Trying to redeem code at URL:', url.href);
+
       try {
         rawTokens = await oidcClient.authorizationCodeGrant(oidcConfig, url, {
           pkceCodeVerifier: codeVerifier,
