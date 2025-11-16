@@ -301,16 +301,15 @@ This should be called *from the frontend* using \`fetch\` just before the token 
       const proxiedPort = c.req.header('X-Forwarded-Port');
       const proxiedProto = c.req.header('X-Forwarded-Proto');
 
+      // FIXME: Using the public URL for verification is not proper
       const url = new URL(c.req.url);
-      if (proxiedHost) {
-        url.host = proxiedHost;
-      }
-      if (proxiedPort) {
-        url.port = proxiedPort;
-      }
-      if (proxiedProto) {
-        url.protocol = proxiedProto;
-      }
+      const publicUrl = new URL(config.PUBLIC_URL);
+
+      url.pathname =
+        publicUrl.pathname.replace(/\/$/, '') + url.pathname.replace(/^\//, '');
+      url.host = proxiedHost || publicUrl.host;
+      url.port = proxiedPort || publicUrl.port;
+      url.protocol = proxiedProto || publicUrl.protocol;
 
       console.log('Trying to redeem code at URL:', url.href);
       console.log('Headers:', c.req.header());
