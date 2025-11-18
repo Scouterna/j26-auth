@@ -46,50 +46,51 @@ function clearAuthCookies(c: Context) {
 }
 
 function setTokenCookies(c: Context, tokens: Tokens) {
-  const expires = new Date(Date.now() + tokens.expires_in * 1000);
+  const accessTokenExpires = new Date(Date.now() + tokens.expires_in * 1000);
+  const refreshTokenExpires = new Date(
+    Date.now() + tokens.refresh_expires_in * 1000,
+  );
 
   const sensitiveCookieOptions: CookieOptions = {
     httpOnly: true,
     secure: !config.INSECURE_COOKIES,
     sameSite: 'Lax',
-    expires,
   };
 
   const publicCookieOptions: CookieOptions = {
     httpOnly: false,
     secure: !config.INSECURE_COOKIES,
     sameSite: 'Lax',
-    expires,
   };
 
   // Sensitive cookies
-  setCookie(
-    c,
-    COOKIES.accessToken,
-    tokens.access_token,
-    sensitiveCookieOptions,
-  );
-  // setCookie(c, COOKIES.idToken, tokens.id_token, sensitiveCookieOptions);
-  setCookie(
-    c,
-    COOKIES.refreshToken,
-    tokens.refresh_token,
-    sensitiveCookieOptions,
-  );
+  setCookie(c, COOKIES.accessToken, tokens.access_token, {
+    ...sensitiveCookieOptions,
+    expires: accessTokenExpires,
+  });
+  // setCookie(c, COOKIES.idToken, tokens.id_token, {
+  //   ...sensitiveCookieOptions,
+  //   expires: accessTokenExpires,
+  // });
+  setCookie(c, COOKIES.refreshToken, tokens.refresh_token, {
+    ...sensitiveCookieOptions,
+    expires: refreshTokenExpires,
+  });
   setCookie(
     c,
     COOKIES.refreshExpiresAt,
     (Date.now() + tokens.refresh_expires_in * 1000).toString(),
-    sensitiveCookieOptions,
+    {
+      ...sensitiveCookieOptions,
+      expires: refreshTokenExpires,
+    },
   );
 
   // Public cookies
-  setCookie(
-    c,
-    COOKIES.expiresAt,
-    expires.getTime().toString(),
-    publicCookieOptions,
-  );
+  setCookie(c, COOKIES.expiresAt, accessTokenExpires.getTime().toString(), {
+    ...publicCookieOptions,
+    expires: accessTokenExpires,
+  });
 }
 
 const app = new Hono()
