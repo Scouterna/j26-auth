@@ -71,15 +71,8 @@ app.use(
   serveStatic({
     root: new URL('../', import.meta.url).pathname,
     rewriteRequestPath: (path) => path.replace(/^\/auth\//, '/'),
-    onNotFound: (path, c) => {
-      console.log(`${path} is not found, you access ${c.req.path}`);
-    },
   }),
 );
 
-// const rootApp = new Hono();
-// rootApp.route('/', app);
-
-// export default rootApp;
 export default app;
 export type AppType = typeof routes;

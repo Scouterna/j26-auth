@@ -68,10 +68,6 @@ function setTokenCookies(c: Context, tokens: Tokens) {
     ...sensitiveCookieOptions,
     expires: accessTokenExpires,
   });
-  // setCookie(c, COOKIES.idToken, tokens.id_token, {
-  //   ...sensitiveCookieOptions,
-  //   expires: accessTokenExpires,
-  // });
   setCookie(c, COOKIES.refreshToken, tokens.refresh_token, {
     ...sensitiveCookieOptions,
     expires: refreshTokenExpires,
