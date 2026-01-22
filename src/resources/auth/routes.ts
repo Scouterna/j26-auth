@@ -344,6 +344,30 @@ This should be called *from the frontend* using \`fetch\` just before the token 
 
       return c.redirect(finalRedirectUri);
     },
+  )
+  .get(
+    '/certs',
+    describeRoute({
+      tags: ['public'],
+      summary: 'Get certificates',
+      description:
+        "Returns the JSON Web Key Set (JWKS) containing the public keys used to verify the tokens. This endpoint is a convience feature that simply proxies the JWKS from the identity provider so that the consumer doesn't have to know where the identity provider is located.",
+      responses: {
+        200: { description: 'Access token refreshed successfully' },
+        500: {
+          description:
+            'Something went wrong while returning the certificates from the identity provider.',
+        },
+      },
+    }),
+    async (c) => {
+      const serverMetadata = oidcConfig.serverMetadata();
+      if (!serverMetadata.jwks_uri) {
+        console.error('JWKS URI not found in server metadata');
+        return c.json(null, 500);
+      }
+      return fetch(serverMetadata.jwks_uri);
+    },
   );
 
 export default app;
