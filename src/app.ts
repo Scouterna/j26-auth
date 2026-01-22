@@ -4,12 +4,10 @@ import { serveStatic } from '@hono/node-server/serve-static';
 import { Scalar } from '@scalar/hono-api-reference';
 
 import { Hono } from 'hono';
-import { openAPIRouteHandler } from 'hono-openapi';
-import auth from './resources/auth/routes.ts';
 import { logger } from 'hono/logger';
+import { openAPIRouteHandler } from 'hono-openapi';
 import config from './config.ts';
-
-const DOCS_URL = `${config.PUBLIC_URL.replace(/\/+$/, '')}/docs`;
+import auth from './resources/auth/routes.ts';
 
 const app = new Hono();
 
@@ -19,7 +17,8 @@ if (config.LOG_REQUESTS) {
 
 app
   .get('/', (c) => {
-    return c.redirect(DOCS_URL);
+    const docsUrl = `${config.PUBLIC_URL.replace(/\/+$/, '')}/docs`;
+    return c.redirect(docsUrl);
   })
   .get(
     '/docs',
