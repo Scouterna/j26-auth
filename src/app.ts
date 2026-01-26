@@ -32,6 +32,8 @@ app
     '/openapi',
     // biome-ignore lint/suspicious/noExplicitAny: This helps with type performance.
     openAPIRouteHandler(app as any, {
+      // The excludeStaticFile option makes the /.well-known/ paths not show up in the docs
+      excludeStaticFile: false,
       documentation: {
         info: {
           title: 'j26-auth',

@@ -346,10 +346,11 @@ This should be called *from the frontend* using \`fetch\` just before the token 
     describeRoute({
       tags: ['public'],
       summary: 'Get certificates',
+      deprecated: true,
       description:
-        "Returns the JSON Web Key Set (JWKS) containing the public keys used to verify the tokens. This endpoint is a convience feature that simply proxies the JWKS from the identity provider so that the consumer doesn't have to know where the identity provider is located.",
+        'Returns the JSON Web Key Set (JWKS) containing the public keys used to verify the tokens. This endpoint is deprecated and will be removed in future versions. Please use the `jwks_uri` field from the OpenID configuration endpoint instead.',
       responses: {
-        200: { description: 'Access token refreshed successfully' },
+        200: { description: 'OK' },
         500: {
           description:
             'Something went wrong while returning the certificates from the identity provider.',
@@ -363,6 +364,25 @@ This should be called *from the frontend* using \`fetch\` just before the token 
         return c.json(null, 500);
       }
       return fetch(serverMetadata.jwks_uri);
+    },
+  )
+  .get(
+    '/.well-known/openid-configuration',
+    describeRoute({
+      tags: ['public'],
+      summary: 'Get OpenID configuration',
+      description: `Returns information for clients integrating using OpenID.
+
+Use the \`jwks_uri\` field from this endpoint to get the location of the JSON Web Key Set (JWKS) containing the public keys used to verify the tokens.
+
+This endpoint is a convience feature that simply proxies the configuration from the identity provider so that the consumer doesn't have to know where the identity provider is located.`,
+      responses: {
+        200: { description: 'OK' },
+      },
+    }),
+    async (c) => {
+      const serverMetadata = oidcConfig.serverMetadata();
+      return c.json(serverMetadata);
     },
   );
 
