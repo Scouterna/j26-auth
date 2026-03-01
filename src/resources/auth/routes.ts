@@ -180,6 +180,41 @@ To initiate the login process, redirect the user to this endpoint. If you do not
   )
 
   .get(
+    '/logout',
+    describeRoute({
+      tags: ['public'],
+      summary: 'Logout',
+      description: `
+Clears authentication cookies and logs the user out.
+
+To log out a user, redirect them to this endpoint. After clearing the authentication cookies, the user will be redirected to the specified \`redirect_uri\`.
+`,
+      responses: {
+        302: { description: 'Redirect to the specified URI after logout' },
+        400: { description: 'Bad request' },
+      },
+    }),
+    validator(
+      'query',
+      type({
+        redirect_uri: type('string').describe(
+          'The URI to redirect to after logout. Should be a user-facing page in your application, typically the home page or login page.',
+        ),
+      }),
+    ),
+    async (c) => {
+      const redirectUri = c.req.valid('query').redirect_uri;
+
+      if (!redirectUriValid(redirectUri)) {
+        return c.text('Invalid redirect URI', 400);
+      }
+
+      clearAuthCookies(c);
+      return c.redirect(redirectUri);
+    },
+  )
+
+  .get(
     '/refresh',
     describeRoute({
       tags: ['public'],
