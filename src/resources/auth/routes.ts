@@ -185,12 +185,14 @@ To initiate the login process, redirect the user to this endpoint. If you do not
       tags: ['public'],
       summary: 'Logout',
       description: `
-Clears authentication cookies and logs the user out.
+Clears authentication cookies and logs the user out from both the application and the identity provider (Keycloak).
 
-To log out a user, redirect them to this endpoint. After clearing the authentication cookies, the user will be redirected to the specified \`redirect_uri\`.
+To log out a user, redirect them to this endpoint. The user will be signed out from Keycloak and then redirected to the specified \`redirect_uri\`.
 `,
       responses: {
-        302: { description: 'Redirect to the specified URI after logout' },
+        302: {
+          description: 'Redirect to Keycloak logout, then to the specified URI',
+        },
         400: { description: 'Bad request' },
       },
     }),
@@ -209,8 +211,13 @@ To log out a user, redirect them to this endpoint. After clearing the authentica
         return c.text('Invalid redirect URI', 400);
       }
 
+      // Clear cookies before redirecting
       clearAuthCookies(c);
-      return c.redirect(redirectUri);
+
+      const endSessionUrl = oidcClient.buildEndSessionUrl(oidcConfig, {
+        post_logout_redirect_uri: redirectUri,
+      });
+      return c.redirect(endSessionUrl.href);
     },
   )
 
