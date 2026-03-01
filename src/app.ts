@@ -3,6 +3,7 @@ import './arktypeConfig.ts';
 import { serveStatic } from '@hono/node-server/serve-static';
 import { Scalar } from '@scalar/hono-api-reference';
 
+import type { Context } from 'hono';
 import { Hono } from 'hono';
 import { logger } from 'hono/logger';
 import { openAPIRouteHandler } from 'hono-openapi';
@@ -10,6 +11,24 @@ import config from './config.ts';
 import auth from './resources/auth/routes.ts';
 
 const app = new Hono();
+
+// Global error handler
+app.onError((err, c: Context) => {
+  console.error('Unhandled error:');
+  console.error('Path:', c.req.path);
+  console.error('Method:', c.req.method);
+  console.error('Error:', err);
+  console.error('Stack:', err.stack);
+
+  // Generic error response
+  return c.json(
+    {
+      error: 'Internal server error',
+      message: 'An unexpected error occurred',
+    },
+    500,
+  );
+});
 
 if (config.LOG_REQUESTS) {
   app.use(logger());
