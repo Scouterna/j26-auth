@@ -68,6 +68,10 @@ function setTokenCookies(c: Context, tokens: Tokens) {
     ...sensitiveCookieOptions,
     expires: accessTokenExpires,
   });
+  setCookie(c, COOKIES.idToken, tokens.id_token, {
+    ...sensitiveCookieOptions,
+    expires: accessTokenExpires,
+  });
   setCookie(c, COOKIES.refreshToken, tokens.refresh_token, {
     ...sensitiveCookieOptions,
     expires: refreshTokenExpires,
@@ -185,12 +189,14 @@ To initiate the login process, redirect the user to this endpoint. If you do not
       tags: ['public'],
       summary: 'Logout',
       description: `
-Clears authentication cookies and logs the user out.
+Clears authentication cookies and logs the user out from both the application and the identity provider (Keycloak).
 
-To log out a user, redirect them to this endpoint. After clearing the authentication cookies, the user will be redirected to the specified \`redirect_uri\`.
+To log out a user, redirect them to this endpoint. The user will be signed out from Keycloak and then redirected to the specified \`redirect_uri\`.
 `,
       responses: {
-        302: { description: 'Redirect to the specified URI after logout' },
+        302: {
+          description: 'Redirect to Keycloak logout, then to the specified URI',
+        },
         400: { description: 'Bad request' },
       },
     }),
@@ -209,7 +215,21 @@ To log out a user, redirect them to this endpoint. After clearing the authentica
         return c.text('Invalid redirect URI', 400);
       }
 
+      const idToken = getCookie(c, COOKIES.idToken);
+
+      // Clear cookies before redirecting
       clearAuthCookies(c);
+
+      // If we have an ID token, sign out from Keycloak properly
+      if (idToken) {
+        const endSessionUrl = oidcClient.buildEndSessionUrl(oidcConfig, {
+          id_token_hint: idToken,
+          post_logout_redirect_uri: redirectUri,
+        });
+        return c.redirect(endSessionUrl.href);
+      }
+
+      // If no ID token, just redirect to the specified URI
       return c.redirect(redirectUri);
     },
   )

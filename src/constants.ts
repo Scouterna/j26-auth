@@ -4,6 +4,7 @@ export const COOKIES = {
   oidcCodeVerifier: `${COOKIE_PREFIX}oidc-code-verifier`,
   oidcNonce: `${COOKIE_PREFIX}oidc-nonce`,
   accessToken: `${COOKIE_PREFIX}access-token`,
+  idToken: `${COOKIE_PREFIX}id-token`,
   refreshToken: `${COOKIE_PREFIX}refresh-token`,
   expiresAt: `${COOKIE_PREFIX}expires-at`,
   refreshExpiresAt: `${COOKIE_PREFIX}refresh-expires-at`,
