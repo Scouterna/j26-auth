@@ -115,11 +115,15 @@ To initiate the login process, redirect the user to this endpoint. If you do not
         redirect_uri: type('string').describe(
           'The URI to redirect to after login. Should be a user-facing page in your application, most likely the page the user was on before being redirected to the login page.',
         ),
+        'locale?': type('string').describe(
+          'Locale passed on to the IDP. In the format "sv", "en" etc.',
+        ),
       }),
     ),
     async (c) => {
       const silent = c.req.valid('query').silent === 'true';
       const finalRedirectUri = c.req.valid('query').redirect_uri;
+      const locale = c.req.valid('query').locale;
 
       if (!redirectUriValid(finalRedirectUri)) {
         return c.text('Invalid redirect URI', 400);
@@ -141,6 +145,10 @@ To initiate the login process, redirect the user to this endpoint. If you do not
 
       if (silent) {
         parameters.prompt = 'none';
+      }
+
+      if (locale) {
+        parameters.ui_locales = locale;
       }
 
       /**
