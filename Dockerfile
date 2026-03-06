@@ -33,4 +33,4 @@ COPY ./static ./static
 EXPOSE 80
 
 # Run the application.
-CMD ["node", "src/index.ts"]
+CMD ["node", "src/server.ts"]

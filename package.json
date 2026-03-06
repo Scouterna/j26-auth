@@ -1,11 +1,29 @@
 {
   "name": "j26-auth",
+  "version": "0.1.0",
   "type": "module",
   "license": "MIT",
   "packageManager": "pnpm@10.17.1",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    },
+    "./server": {
+      "import": "./src/server.ts"
+    }
+  },
+  "files": [
+    "src",
+    "static",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
-    "dev": "node --env-file .env --watch src/index.ts",
-    "start": "node --env-file .env src/index.ts",
+    "dev": "node --env-file .env --watch src/server.ts",
+    "start": "node --env-file .env src/server.ts",
     "lint": "biome check",
     "lint:fix": "biome check --write",
     "gen:docs": "pnpm run gen:openapi && npm run gen:scalar",
