@@ -1,12 +1,45 @@
 (() => {
   const EXPIRES_AT_COOKIE = 'j26-auth_expires-at';
+  const RELOAD_FLAG_COOKIE = 'j26-auth_reload-flag';
   const REFRESH_THRESHOLD_SECONDS = 10;
+  const RELOAD_FLAG_SECONDS = 120; // Lifetime of a cookie that prevent reload loops
 
-  async function refresh() {
+  function hasReloadFlag() {
+    return (
+      document.cookie.match(new RegExp(`(^| )${RELOAD_FLAG_COOKIE}=`)) !== null
+    );
+  }
+
+  function setReloadFlag() {
+    const expires = new Date(
+      Date.now() + RELOAD_FLAG_SECONDS * 1000,
+    ).toUTCString();
+    // biome-ignore lint/suspicious/noDocumentCookie: cookie store API is async, synchronous write needed here
+    document.cookie = `${RELOAD_FLAG_COOKIE}=1; expires=${expires}; path=/`;
+  }
+
+  async function refresh(isInitialLoad = false) {
     if (!window.__j26PreventRefresh) {
-      await fetch('/auth/refresh');
+      console.debug('Requesting token refresh');
+      const res = await fetch('/auth/refresh');
+
+      if (!res.ok) {
+        console.warn(`Token refresh failed with status ${res.status}`);
+      } else {
+        console.info('Token refreshed successfully');
+
+        if (isInitialLoad) {
+          if (!hasReloadFlag()) {
+            console.info('Reloading page to apply initial token');
+            setReloadFlag();
+            window.location.reload();
+            return;
+          }
+          console.warn('Reload flag is active — skipping reload to prevent loop');
+        }
+      }
     } else {
-      console.debug('Token refresh prevented by __j26PreventRefresh');
+      console.debug('Token refresh skipped (__j26PreventRefresh is set)');
     }
 
     scheduleRefresh();
@@ -25,32 +58,41 @@
     return null;
   }
 
-  function scheduleRefresh() {
+  function scheduleRefresh(isInitialLoad = false) {
     const expiresAt = getExpiresAtFromCookie();
+
     if (!expiresAt) {
-      console.debug('No expires at cookie found');
+      console.warn('Auth expiry cookie not found — refreshing immediately');
+      setTimeout(() => {
+        refresh(isInitialLoad).catch((err) => {
+          console.error('Unhandled error during token refresh:', err);
+        });
+      }, 0);
+      return;
     }
 
-    console.log('Expires at:', expiresAt);
-
-    let refreshIn = expiresAt
-      ? expiresAt - Date.now() - REFRESH_THRESHOLD_SECONDS * 1000
-      : 0;
+    let refreshIn = expiresAt - Date.now() - REFRESH_THRESHOLD_SECONDS * 1000;
 
     if (refreshIn < 0 && refreshIn > -REFRESH_THRESHOLD_SECONDS * 1000) {
+      console.warn('Token is expiring imminently — refreshing in 1s');
       refreshIn = 1000;
     } else if (refreshIn <= 0) {
+      console.warn(
+        `Token expired ${Math.round(-refreshIn / 1000)}s ago — retrying in 60s`,
+      );
       refreshIn = 60_000;
+    } else {
+      console.debug(
+        `Next token refresh in ${Math.round(refreshIn / 1000)}s (token expires at ${new Date(expiresAt).toISOString()})`,
+      );
     }
-
-    console.debug(`Scheduling token refresh in ${Math.max(refreshIn, 0)} ms`);
 
     setTimeout(() => {
       refresh().catch((err) => {
-        console.error('Error refreshing token:', err);
+        console.error('Unhandled error during token refresh:', err);
       });
     }, refreshIn);
   }
 
-  scheduleRefresh();
+  scheduleRefresh(true);
 })();
