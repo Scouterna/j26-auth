@@ -25,6 +25,10 @@
 
       if (!res.ok) {
         console.warn(`Token refresh failed with status ${res.status}`);
+        if (res.status === 401) {
+          console.warn('Session expired — stopping refresh loop');
+          return;
+        }
       } else {
         console.info('Token refreshed successfully');
 
